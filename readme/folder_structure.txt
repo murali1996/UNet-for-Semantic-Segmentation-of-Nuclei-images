@@ -1,0 +1,36 @@
+-codes
+	-old_versions
+	-readme
+	...
+-data_gen
+	-m1
+	-m2
+	-m3
+	-test1
+	-test2
+	-train
+	-train_resize
+-data_org
+	-stage1_test
+	-stage2_test
+	-stage1_train
+	-zip
+-data_dummy
+	...
+-logs
+	-m1
+	-m2
+	-m3
+-model_weights
+	-m1
+		-train
+		-validate
+	-m2
+		-train
+		-validate
+	-m3
+		-train
+		-validate
+-stain_norm
+	-Peter554
+-submissions

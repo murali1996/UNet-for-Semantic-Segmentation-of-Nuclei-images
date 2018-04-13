@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import os, random
 
+############################################# DATA ANALYSIS ###################################################
+hsv_clustering_data = os.path.join(os.curdir, "hsv_clustering.pickle");
+
 ############################################# DATA AUGMENTATION ###################################################
 max_non_mask_pixel_percent = 0.95
 win_shift_rows, win_shift_cols = 128, 128;
@@ -10,12 +13,17 @@ image_patch_rows_test, image_patch_cols_test, image_patch_channels_test = 256, 2
 rotate_angles = [0]+random.sample([90, 180, 270],1) #In degrees
 
 ############################################# MAIN FOLDERS ###################################################
-train_folder_org  = os.path.join(os.pardir,'data_org/stage1_train');
-test_folder_org   = os.path.join(os.pardir,'data_org/stage1_test');
-train_folder_gen   = os.path.join(os.pardir,'data_gen/train');
-test_folder_gen   = os.path.join(os.pardir,'data_gen/test');
+data_dummy = os.path.join(os.pardir,r'data_dummy');
 
+train_folder_org  = os.path.join(os.pardir,'data_org/stage1_train');
+train_folder_gen   = os.path.join(os.pardir,'data_gen/train');
 train_folder_gen_resize   = os.path.join(os.pardir,'data_gen/train_resize');
+
+test_folder_org   = os.path.join(os.pardir,'data_org/stage1_test');
+test_folder_gen   = os.path.join(os.pardir,'data_gen/test1');
+
+test2_folder_org   = os.path.join(os.pardir,'data_org/stage2_test_final');
+test2_folder_gen   = os.path.join(os.pardir,'data_gen/test2');
 
 train_folder_gen_m1  = os.path.join(os.pardir,'data_gen/m1/train');
 train_folder_gen_m2  = os.path.join(os.pardir,'data_gen/m2/train');
@@ -31,7 +39,7 @@ logs_folder = os.path.join(os.pardir, "logs/m3")
 ############################################# MODEL TESTING ###################################################
 best_model_path_m1 = os.path.join(base_model_weights_validate,r'weights-epoch-13-loss-0.1048-val_loss-0.1183.hdf5')
 best_model_path_m2 = os.path.join(base_model_weights_validate,r'weights-epoch-20-loss-0.1434-val_loss-0.1685.hdf5')
-best_model_path_m3 = os.path.join(base_model_weights_validate,r'weights-epoch-30-loss-0.1348-val_loss-0.1336.hdf5');
+best_model_path_m3 = os.path.join(base_model_weights_validate,r'weights-epoch-35-loss-0.1771-val_loss-0.1767.hdf5');
 submit_path = os.path.join(os.pardir,r'submissions');
 
 ############################################# MISC. ###################################################

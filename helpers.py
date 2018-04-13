@@ -4,6 +4,19 @@ import cv2, numpy as np, os
 import params
 from keras.preprocessing import image as kimage
 
+######################### RLE TO MASK ###########################################################
+def rleToMask(rleString,height,width):
+    rows,cols = height,width
+    rleNumbers = [int(numstring) for numstring in rleString.split(' ')]
+    rlePairs = np.array(rleNumbers).reshape(-1,2)
+    img = np.zeros(rows*cols,dtype=np.uint8)
+    for index,length in rlePairs:
+        index -= 1
+        img[index:index+length] = 255
+    img = img.reshape(cols,rows)
+    img = img.T
+    return img
+
 ######################### IMAGE UNET INPUT ###########################################################
 def append_hsv_image(bgr_image):
     hsv_image = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2HSV);

@@ -10,7 +10,6 @@ import random
 random.seed(10)
 
 import params
-from data_m3 import get_bw_mask
 all_train_folders = os.listdir(params.train_folder_org)
 
 #==============================================================================
@@ -43,7 +42,7 @@ def get_all_dominant_clusters(dominant_centers = []):
     return dominant_centers
 
 if __name__=="__main__":
-
+    from data_m3 import get_bw_mask
     # Get representative cluster of each image
     dominant_centers = get_all_dominant_clusters()
     inertias = [];

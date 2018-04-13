@@ -65,14 +65,15 @@ def train_model(model, tr_list, val_list, data_dir, batch_size, n_epochs, verbos
     checkpoint1 = ModelCheckpoint(filepath1, monitor='loss', verbose=1, save_best_only=True, mode='min')
     checkpoint2 = ModelCheckpoint(filepath2, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
     tensor_logs = TensorBoard(log_dir = params.logs_folder)
+    #adapt_LR = ReduceLROnPlateau(monitor='val_loss',factor=0.1,patience=4,verbose=1,epsilon=1e-4);
     adapt_LR = ReduceLROnPlateau(monitor='val_loss',factor=0.1,patience=4,verbose=1,epsilon=1e-4);
-    callbacks_list = [checkpoint1,checkpoint2,tensor_logs,adapt_LR]
+    callbacks_list = [checkpoint1, checkpoint2, tensor_logs, adapt_LR]
     History = model.fit_generator(
             batch_generator(tr_list, data_dir, batch_size, True),
             steps_per_epoch = int(len(tr_list)/batch_size),
             epochs = n_epochs,
             verbose = verbose,
-            initial_epoch = 30,
+            initial_epoch = 37,
             validation_data = batch_generator(val_list, data_dir, batch_size, True),
             validation_steps = int(len(val_list)/batch_size),
             callbacks = callbacks_list)
@@ -83,7 +84,7 @@ def train_model(model, tr_list, val_list, data_dir, batch_size, n_epochs, verbos
 if __name__=="__main__":
 ###################################### TRAINING #########################################################
     # Load Model
-    wanna_train = True # If true, start from epoch 30 {Please check the folder and decide}
+    wanna_train = False # If true, start from epoch 30 {Please check the folder and decide}
     model_path = params.best_model_path_m3;
     if model_path is not None:
         model = load_model(model_path, custom_objects={'bce_dice_loss': bce_dice_loss,'dice_coeff':dice_coeff});
@@ -93,11 +94,11 @@ if __name__=="__main__":
         print('UNET model initialized loaded');
     # Model training
     if wanna_train:
-        target_folder = params.train_folder_gen_resize
+        target_folder = params.train_folder_gen_m3
         # Get Training List and split train-validation sets
         tr_list_full = load_train_list_with_augmentation(target_folder);
         print('Length of Training Data: ',len(tr_list_full));
-        tr_list, val_list = train_test_split(tr_list_full, test_size=0.05, random_state=seed);
+        tr_list, val_list = train_test_split(tr_list_full, test_size=0.20, random_state=seed);
         #model, History = train_model(model, tr_list, val_list, params.train_folder_gen_m3, batch_size, n_epochs);
         model, History = train_model(model, tr_list, val_list, target_folder, batch_size, n_epochs);
 ####################################### Quick TESTING BY RESIZING ######################################################
@@ -126,10 +127,12 @@ if __name__=="__main__":
 ####################################### FULL TESTING BY RESIZING ######################################################
 #    images = [];
 #    masks = [];
-#    ts_list = load_test_list(); print('Length of Testing Data: ',len(ts_list));
+#    test_images_folder = params.test2_folder_gen;
+#    ts_list = load_test_list(test_images_folder);
+#    print('Length of Testing Data: ',len(ts_list));
 #    for ind, item in enumerate(ts_list):
 #        print(ind);
-#        image_path = os.path.join(params.test_folder_gen,item+'.png');
+#        image_path = os.path.join(test_images_folder,item+'.png');
 #        image = cv2.imread(image_path);
 #        images.append(image);
 #        resized_image = cv2.resize(image, (256, 256), interpolation = cv2.INTER_LINEAR);
@@ -139,13 +142,14 @@ if __name__=="__main__":
 #        pred_image = model.predict([ycrcb_image, bgr_image])[0];
 #        pred_image[pred_image > 0.5] = 1; # threshold
 #        pred_image = pred_image.astype(np.uint8);
-#        #resize_pred_image_lin = cv2.resize(pred_image, (image.shape[1], image.shape[0]), interpolation = cv2.INTER_LINEAR);
+#        ##resize_pred_image_lin = cv2.resize(pred_image, (image.shape[1], image.shape[0]), interpolation = cv2.INTER_LINEAR);
 #        resize_pred_image_cub = cv2.resize(pred_image, (image.shape[1], image.shape[0]), interpolation = cv2.INTER_CUBIC);
 #        masks.append(resize_pred_image_cub);
-#        cv2.imshow( "{0}".format('image'), image);
-#        #cv2.imshow( "{0}_mask_linear".format('image'), 255*resize_pred_image_lin);
-#        cv2.imshow( "{0}_mask_cubic".format('image'), 255*resize_pred_image_cub);
-#        cv2.waitKey(0);
+#        #cv2.imshow( "{0}".format('image'), image);
+#        ##cv2.imshow( "{0}_mask_linear".format('image'), 255*resize_pred_image_lin);
+#        #cv2.imshow( "{0}_mask_cubic".format('image'), 255*resize_pred_image_cub);
+#        #cv2.waitKey(0);
+#        cv2.imwrite(os.path.join(test_images_folder,item+'_mask.png'),255*resize_pred_image_cub);
 ####################################### TESTING  BY PATCHES ######################################################
 #    from data_m3 import make_patches_and_predict
 #    images = [];
@@ -190,7 +194,7 @@ if __name__=="__main__":
 #        #            np.hstack((255*mask,255*er_mask,255*dl_mask)) );
 #        #cv2.waitKey(0);
 #    del i, iterations1, iterations2, mask, kernel, dl_mask, er_mask
-
+####################################### EXTRACTING SEGMENTS ##################################################
     # Stats on segments (Connected Components)
 #    from scipy import ndimage
 #    mx_segment, n_segments = [], [];
@@ -204,7 +208,7 @@ if __name__=="__main__":
 #        n_segments+=[len(sizes)]
 #        #np.sort(sizes)
 #    del i, j, mask, label_im, nb_labels, sizes
-    # Count > threshold
+#    #Count > threshold
 #    up_thres = np.mean(sizes);
 #    cnt = 0;
 #    for size in sizes:
@@ -228,7 +232,7 @@ if __name__=="__main__":
 #            df.loc[ind,'EncodedPixels'] = rle_encoding(label_im, j+1);
 #            ind+=1;
 #    del i, j, ind, mask, label_im, nb_labels
-#    df.to_csv(os.path.join(params.submit_path,'9_4_18_sub2.csv'), index=False)
+#    df.to_csv(os.path.join(params.submit_path,'13_4_18_sub1_test2.csv'), index=False)
 #########################################################################################################
 #########################################################################################################
 #########################################################################################################
