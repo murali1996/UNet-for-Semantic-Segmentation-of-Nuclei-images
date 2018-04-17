@@ -42,7 +42,8 @@ for i in range(1,4):
     path = os.path.join(base_path, 'image_ ({}).png'.format(i));
     image = cv2.imread(path)
     cv2.imshow('Image',image);
-
+    break;
+    
     R,G,B = cv2.split(image);
     cv2.imshow('RGB',np.hstack((R,G,B)));
 
@@ -58,4 +59,32 @@ for i in range(1,4):
     H,S,V = cv2.split(image_hsv);
     cv2.imshow('HSV',np.hstack((H,S,V-20)));
     cv2.waitKey(0)
+
+############## MEDIAN FILTERING ########################
+image = image[:,:,0]
+image_prep = cv2.medianBlur(image, 3)
+image_stack = np.hstack((image, image_prep)) #stacking images side-by-side
+cv2.imshow('median', image_stack)
+############## HISTOGRAM EQUILIZATION ##################
+#image = image[:,:,0]
+#hist_equ = cv2.equalizeHist(image)
+#res = np.hstack((image,hist_equ)) #stacking images side-by-side
+#cv2.imshow('res.png',res)
+############## CLAHE EQUILIZATION ########################
+clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+image_prep = clahe.apply(image_prep)
+image_stack = np.hstack((image,image_prep)) #stacking images side-by-side
+cv2.imshow('clahe',image_stack)
+############## GAMMA FILTERING ########################
+def adjust_gamma(image, gamma=1.0):
+    # build a lookup table mapping the pixel values [0, 255] to
+    # their adjusted gamma values
+    invGamma = 1.0 / gamma
+    table = np.array([((i / 255.0) ** invGamma) * 255 for i in np.arange(0, 256)]).astype("uint8")
+    # apply gamma correction using the lookup table
+    return cv2.LUT(image, table)
+g_image = adjust_gamma(image_prep, gamma=1.5)
+cv2.imshow('G-Image', g_image);
+
+
 

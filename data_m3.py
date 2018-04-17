@@ -369,11 +369,13 @@ def generate_original_copies_test_data(source_folder, target_folder):
 #    return pred_image_thres #, mask_matrix
 
 if __name__=="__main__":
-    generate_original_copies_train_data(params.train_folder_org, params.train_folder_gen);
+    #generate_original_copies_train_data(params.train_folder_org, params.train_folder_gen);
     #generate_original_copies_test_data(params.test_folder_org, params.test_folder_gen);
     #generate_original_copies_test_data(params.test2_folder_org, params.test2_folder_gen);
+    
     #org_names, gen_names, gen_names_ind, gen_names_ind_cnt = generate_train_data_with_augmentation(params.train_folder_gen_m3); #Uses global variable
     #org_names, gen_names = generate_train_data_only_resize(params.train_folder_gen_resize)
+    
     #tr_list = load_train_list_with_augmentation(params.train_folder_gen);
     #ts_list = load_test_list(params.test_folder_gen)
     print('Execution Complete. Please check respective folders as mentioned in params.')
